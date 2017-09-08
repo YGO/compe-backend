@@ -1,8 +1,7 @@
-<!--
+
 title: AWS Serverless 
 description: Setup Web Service to get list and update players. DynamoDB is used to store the data. 
 layout: Doc
--->
 
 ## Setup
 
@@ -44,7 +43,7 @@ functions:
 
 ## Usage
 
-You can retrieve, update todos with the following commands:
+You can retrieve, update player with the following commands:
 
 
 ### List all Players
@@ -59,7 +58,7 @@ Example output:
 ```
 
 
-### Update a Todo
+### Update a Player
 
 ```bash
 # Replace the <id> part with a real id from your todos table
