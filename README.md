@@ -1,7 +1,8 @@
 
-title: AWS Serverless 
+# AWS Serverless
+
 description: Setup Web Service to get list and update players. DynamoDB is used to store the data. 
-layout: Doc
+
 
 ## Setup
 
