@@ -5,14 +5,23 @@ const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-depe
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 module.exports.update = (event, context, callback) => {
-  const timestamp = new Date().getTime();
-  const data = JSON.parse(event.body);
-
+ 
+  const data = JSON.parse(event.body);  
+  var cmd = '';
   // validation
-  if (typeof data.text !== 'string' || typeof data.checked !== 'boolean') {
-    console.error('Validation Failed');
-    callback(new Error('Couldn\'t update the todo item.'));
-    return;
+  if(typeof data.retired === 'boolean'){
+    cmd = 'SET retired = :retired';
+  }
+  else if(data.scores_day1 !== 'undefined' && Array.isArray(data.scores_day1)){
+    cmd = 'SET scores_day1 = :scores_day1';
+  }
+  else if(data.scores_day2 !== 'undefined' && Array.isArray(data.scores_day2)){
+    cmd = 'SET scores_day2 = :scores_day2';
+  }
+  else{
+      console.error('Validation Failed');
+      callback(new Error('Couldn\'t update the player.'));
+      return;
   }
 
   const params = {
@@ -20,24 +29,21 @@ module.exports.update = (event, context, callback) => {
     Key: {
       id: event.pathParameters.id,
     },
-    ExpressionAttributeNames: {
-      '#todo_text': 'text',
-    },
     ExpressionAttributeValues: {
-      ':text': data.text,
-      ':checked': data.checked,
-      ':updatedAt': timestamp,
+      ':scores_day1': data.scores_day1,
+      ':scores_day2': data.scores_day2,
+      ':retired': data.retired,
+
     },
-    UpdateExpression: 'SET #todo_text = :text, checked = :checked, updatedAt = :updatedAt',
+    UpdateExpression: cmd,
     ReturnValues: 'ALL_NEW',
   };
 
-  // update the todo in the database
   dynamoDb.update(params, (error, result) => {
     // handle potential errors
     if (error) {
       console.error(error);
-      callback(new Error('Couldn\'t update the todo item.'));
+      callback(new Error('Couldn\'t update the player.'));
       return;
     }
 
