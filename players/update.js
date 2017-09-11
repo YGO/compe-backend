@@ -38,7 +38,8 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 module.exports.update = (event, context, callback) => {
   const data = JSON.parse(event.body);
 
-  if(!v.validate(data, schema).valid) { 
+  if(!v.validate(data, schema).valid) {
+    console.error('Validation Failed'); 
     callback(null, {statusCode: 400});
     return; 
   }
@@ -65,6 +66,7 @@ module.exports.update = (event, context, callback) => {
   dynamoDb.update(params, (error, result) => {
     // handle potential errors
     if (error) {
+      console.error(error);
       callback(null, {statusCode: 400});
       return;
     }

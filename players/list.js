@@ -12,6 +12,7 @@ module.exports.list = (event, context, callback) => {
   dynamoDb.scan(params, (error, result) => {
     // handle potential errors
     if (error) {
+      console.error(error);
       callback(null, {statusCode: 400});
       return;
     }
