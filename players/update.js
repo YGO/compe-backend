@@ -8,28 +8,28 @@ let schema = {
               "title": "Player",
               "type": "object",
               "properties": {
-                  "name": {
-                      "type": "string"
+                "name": {
+                    "type": "string"
+                },
+                "scores_day1": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
                   },
-                  "scores_day1": {
-                    "type": "array",
-                    "items": {
-                      "type": "integer"
-                    },
-                    "minItems": 18,
-                    "maxItems": 18
+                  "minItems": 18,
+                  "maxItems": 18
+                },
+                "scores_day2": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
                   },
-                  "scores_day2": {
-                    "type": "array",
-                    "items": {
-                      "type": "integer"
-                    },
-                    "minItems": 18,
-                    "maxItems": 18
-                  },
-                  "retired": {
-                      "type": "boolean"
-                  },
+                  "minItems": 18,
+                  "maxItems": 18
+                },
+                "retired": {
+                    "type": "boolean"
+                },
               },
               "required": ["name", "scores_day1", "scores_day2", "retired"]
             };
@@ -37,12 +37,9 @@ let schema = {
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 module.exports.update = (event, context, callback) => {
   const data = JSON.parse(event.body);
-  
+
   if(!v.validate(data, schema).valid) { 
-    callback(null, {
-        statusCode: 400,
-        body: JSON.stringify({"message": "Some parameters are invalid."})
-    });
+    callback(null, {statusCode: 400});
     return; 
   }
 
@@ -68,17 +65,11 @@ module.exports.update = (event, context, callback) => {
   dynamoDb.update(params, (error, result) => {
     // handle potential errors
     if (error) {
-      callback(null, {
-        statusCode: 400,
-        body: JSON.stringify({"message": "Couldn\'t update the player."})
-      });
+      callback(null, {statusCode: 400});
       return;
     }
 
     // create a response
-    callback(null, {
-      statusCode: 200,
-      body: JSON.stringify(result.Attributes),
-    });
+    callback(null, {statusCode: 200});
   });
 };

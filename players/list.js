@@ -12,8 +12,7 @@ module.exports.list = (event, context, callback) => {
   dynamoDb.scan(params, (error, result) => {
     // handle potential errors
     if (error) {
-      console.error(error);
-      callback(new Error('Couldn\'t fetch the players.'));
+      callback(null, {statusCode: 400});
       return;
     }
 
