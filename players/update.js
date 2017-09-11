@@ -2,36 +2,43 @@
 
 const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-dependencies
 
-const dynamoDb = new AWS.DynamoDB.DocumentClient();
+const Validator = require('jsonschema').Validator;
+const v = new Validator();
+let schema = {
+    "type": "object",
+    "properties": {
+      "name": { "type": "string" },
+      "retired": { "type": "boolean" },
+      "scores_day1": { "type": "array" },
+      "scores_day2": { "type": "array" }
+    }
+};
 
+const dynamoDb = new AWS.DynamoDB.DocumentClient();
 module.exports.update = (event, context, callback) => {
   const data = JSON.parse(event.body);  
   let cmd = '';
+  if(v.validate(data, schema).valid) { //valid with schema
+    let title = '';
+    var num = 1;
+    for (var key in data) {
+      title = key;
+      if(title === 'name')
+        title = '#player_name';
 
-  if(typeof data.name === 'string'){
-    cmd = 'SET #player_name = :name';
-  }
-
-  if(data.retired !== 'undefined' && typeof data.retired === 'boolean'){
-    cmd = checkCommand(cmd,'retired');
-  }
-
-
-  if(data.scores_day1 !== 'undefined' && Array.isArray(data.scores_day1)){
-    cmd = checkCommand(cmd,'scores_day1');
-  }
-
-  if(data.scores_day2 !== 'undefined' && Array.isArray(data.scores_day2)){
-    cmd = checkCommand(cmd,'scores_day2');
-  }
-
-  if(cmd === ''){
-      const response = {
+      if(num === 1){
+          cmd = 'SET ' + title +' = :'+key;
+        }else{
+          cmd += ', '+ title +' = :'+key;
+      }
+      num ++;
+    }
+  }else{
+    callback(null, {
         statusCode: 400,
-        body: JSON.stringify({"message": "Some parameters are invalid."}),
-      };
-      callback(null, response);
-      return;
+        body: JSON.stringify({"message": "Some parameters are invalid."})
+    });
+    return; 
   }
 
   const params = {
@@ -57,28 +64,17 @@ module.exports.update = (event, context, callback) => {
   dynamoDb.update(params, (error, result) => {
     // handle potential errors
     if (error) {
-      const response = {
+      callback(null, {
         statusCode: 400,
-        body: JSON.stringify({"message": "Couldn\'t update the player."}),
-      };
-      callback(null, response);
+        body: JSON.stringify({"message": "Couldn\'t update the player."})
+      });
       return;
     }
 
     // create a response
-    const response = {
+    callback(null, {
       statusCode: 200,
       body: JSON.stringify(result.Attributes),
-    };
-    callback(null, response);
+    });
   });
 };
-
-function checkCommand(cmd, parameters) {
-  if(cmd === ''){
-    cmd = 'SET ' + parameters +' = :'+parameters;
-  }else{
-    cmd += ', '+ parameters +' = :'+parameters;
-  }
-  return cmd;
-}
