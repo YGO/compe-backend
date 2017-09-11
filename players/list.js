@@ -8,12 +8,12 @@ const params = {
 };
 
 module.exports.list = (event, context, callback) => {
-  // fetch all todos from the database
+  // fetch all players from the database
   dynamoDb.scan(params, (error, result) => {
     // handle potential errors
     if (error) {
       console.error(error);
-      callback(new Error('Couldn\'t fetch the todos.'));
+      callback(null, {statusCode: 400});
       return;
     }
 
