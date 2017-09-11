@@ -68,6 +68,7 @@ curl -X PUT https://XXXXXXX.execute-api.us-east-1.amazonaws.com/dev/players/<id>
 
 Example Result:
 ```bash
-{"scores_day2":[1,2,3,4,5,6,7,26],"scores_day1":[1,2,3,4,5,1,4,26],"id":"0dd775b0-93b4-11e7-a5d0-ed9001309ef9","name":"Learn Serverless","retired":false}%
+statusCode: 200
+
 ```
 
