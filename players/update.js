@@ -5,35 +5,40 @@ const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-depe
 const Validator = require('jsonschema').Validator;
 const v = new Validator();
 let schema = {
-    "type": "object",
-    "properties": {
-      "name": { "type": "string" },
-      "retired": { "type": "boolean" },
-      "scores_day1": { "type": "array" },
-      "scores_day2": { "type": "array" }
-    }
-};
+              "title": "Player",
+              "type": "object",
+              "properties": {
+                  "name": {
+                      "type": "string"
+                  },
+                  "scores_day1": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "minItems": 18,
+                    "maxItems": 18
+                  },
+                  "scores_day2": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "minItems": 18,
+                    "maxItems": 18
+                  },
+                  "retired": {
+                      "type": "boolean"
+                  },
+              },
+              "required": ["name", "scores_day1", "scores_day2", "retired"]
+            };
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 module.exports.update = (event, context, callback) => {
-  const data = JSON.parse(event.body);  
-  let cmd = '';
-  if(v.validate(data, schema).valid) { //valid with schema
-    let title = '';
-    var num = 1;
-    for (var key in data) {
-      title = key;
-      if(title === 'name')
-        title = '#player_name';
-
-      if(num === 1){
-          cmd = 'SET ' + title +' = :'+key;
-        }else{
-          cmd += ', '+ title +' = :'+key;
-      }
-      num ++;
-    }
-  }else{
+  const data = JSON.parse(event.body);
+  
+  if(!v.validate(data, schema).valid) { 
     callback(null, {
         statusCode: 400,
         body: JSON.stringify({"message": "Some parameters are invalid."})
@@ -46,6 +51,9 @@ module.exports.update = (event, context, callback) => {
     Key: {
       id: event.pathParameters.id,
     },
+    ExpressionAttributeNames:{
+      '#player_name': 'name'
+    },
     ExpressionAttributeValues: {
       ':name': data.name,
       ':retired': data.retired,
@@ -53,14 +61,10 @@ module.exports.update = (event, context, callback) => {
       ':scores_day2': data.scores_day2,
 
     },
-    UpdateExpression: cmd,
+    UpdateExpression: 'SET #player_name = :name, scores_day1 = :scores_day1, scores_day2 = :scores_day2, retired = :retired',
     ReturnValues: 'ALL_NEW',
   };
 
-  if(typeof data.name === 'string'){
-    params.ExpressionAttributeNames = {'#player_name': 'name'};
-  }
-  
   dynamoDb.update(params, (error, result) => {
     // handle potential errors
     if (error) {
