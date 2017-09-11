@@ -4,7 +4,7 @@ const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-depe
 
 const Validator = require('jsonschema').Validator;
 const v = new Validator();
-let schema = {
+const schema = {
               "title": "Player",
               "type": "object",
               "properties": {
