@@ -5,22 +5,32 @@ const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-depe
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 module.exports.update = (event, context, callback) => {
- 
   const data = JSON.parse(event.body);  
-  var cmd = '';
-  // validation
-  if(typeof data.retired === 'boolean'){
-    cmd = 'SET retired = :retired';
+  let cmd = '';
+
+  if(typeof data.name === 'string'){
+    cmd = 'SET #player_name = :name';
   }
-  else if(data.scores_day1 !== 'undefined' && Array.isArray(data.scores_day1)){
-    cmd = 'SET scores_day1 = :scores_day1';
+
+  if(data.retired !== 'undefined' && typeof data.retired === 'boolean'){
+    cmd = checkCommand(cmd,'retired');
   }
-  else if(data.scores_day2 !== 'undefined' && Array.isArray(data.scores_day2)){
-    cmd = 'SET scores_day2 = :scores_day2';
+
+
+  if(data.scores_day1 !== 'undefined' && Array.isArray(data.scores_day1)){
+    cmd = checkCommand(cmd,'scores_day1');
   }
-  else{
-      console.error('Validation Failed');
-      callback(new Error('Couldn\'t update the player.'));
+
+  if(data.scores_day2 !== 'undefined' && Array.isArray(data.scores_day2)){
+    cmd = checkCommand(cmd,'scores_day2');
+  }
+
+  if(cmd === ''){
+      const response = {
+        statusCode: 400,
+        body: JSON.stringify({"message": "Some parameters are invalid."}),
+      };
+      callback(null, response);
       return;
   }
 
@@ -30,20 +40,28 @@ module.exports.update = (event, context, callback) => {
       id: event.pathParameters.id,
     },
     ExpressionAttributeValues: {
+      ':name': data.name,
+      ':retired': data.retired,
       ':scores_day1': data.scores_day1,
       ':scores_day2': data.scores_day2,
-      ':retired': data.retired,
 
     },
     UpdateExpression: cmd,
     ReturnValues: 'ALL_NEW',
   };
 
+  if(typeof data.name === 'string'){
+    params.ExpressionAttributeNames = {'#player_name': 'name'};
+  }
+  
   dynamoDb.update(params, (error, result) => {
     // handle potential errors
     if (error) {
-      console.error(error);
-      callback(new Error('Couldn\'t update the player.'));
+      const response = {
+        statusCode: 400,
+        body: JSON.stringify({"message": "Couldn\'t update the player."}),
+      };
+      callback(null, response);
       return;
     }
 
@@ -55,3 +73,12 @@ module.exports.update = (event, context, callback) => {
     callback(null, response);
   });
 };
+
+function checkCommand(cmd, parameters) {
+  if(cmd === ''){
+    cmd = 'SET ' + parameters +' = :'+parameters;
+  }else{
+    cmd += ', '+ parameters +' = :'+parameters;
+  }
+  return cmd;
+}
