@@ -62,13 +62,8 @@ Example output:
 ### Update a Player
 
 ```bash
-# Replace the <id> part with a real id from your players table. We can use parameter as scores_day1, scores_day2 or retired
-curl -X PUT https://XXXXXXX.execute-api.us-east-1.amazonaws.com/dev/players/<id> --data '{ "retired":false }'
-
-curl -X PUT https://XXXXXXX.execute-api.us-east-1.amazonaws.com/dev/players/<id> --data '{ "scores_day1":[1,2,3,4,5,1,4,26] }'
-
-
-curl -X PUT https://XXXXXXX.execute-api.us-east-1.amazonaws.com/dev/players/<id> --data '{ "scores_day2":[1,2,3,4,5,1,4,26] }'
+# Replace the <id> part with a real id from your players table. The parameters must use: name, scores_day1, scores_day2, retired
+curl -X PUT https://XXXXXXX.execute-api.us-east-1.amazonaws.com/dev/players/<id> --data '{ {"scores_day1":[1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8],"name":"test","retired":false,"scores_day2":[1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8] } }'
 ```
 
 Example Result:
