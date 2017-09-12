@@ -63,12 +63,15 @@ Example output:
 
 ```bash
 # Replace the <id> part with a real id from your players table. The parameters must use: name, scores_day1, scores_day2, retired
-curl -X PUT https://XXXXXXX.execute-api.us-east-1.amazonaws.com/dev/players/<id> --data '{ {"scores_day1":[1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8],"name":"test","retired":false,"scores_day2":[1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8] } }'
+curl -X PUT https://XXXXXXX.execute-api.us-east-1.amazonaws.com/dev/players/<id> --data '{"scores_day1":[1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8],"name":"test","retired":false,"scores_day2":[1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8] }'
 ```
 
-Example Result:
-```bash
-statusCode: 200
+The data will be updated when we got 204 from HTTP Status code.
 
+|HTTP Status Code| Description                  |
+|----------------|------------------------------|
+|204             |The data of player is updated |
+|----------------|------------------------------|
+|422             |Parameter validation failed   |
 ```
 

@@ -40,7 +40,7 @@ module.exports.update = (event, context, callback) => {
 
   if(!v.validate(data, schema).valid) {
     console.error('Validation Failed'); 
-    callback(null, {statusCode: 400});
+    callback(null, {statusCode: 422});
     return; 
   }
 
@@ -72,6 +72,6 @@ module.exports.update = (event, context, callback) => {
     }
 
     // create a response
-    callback(null, {statusCode: 200});
+    callback(null, {statusCode: 204});
   });
 };
