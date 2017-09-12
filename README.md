@@ -71,6 +71,7 @@ The data will be updated when we got 204 from HTTP Status code.
 |HTTP Status Code| Description                  |
 |----------------|------------------------------|
 |204             |The data of player is updated |
-
+|----------------|------------------------------|
+|422             |Parameter validation failed   |
 ```
 
