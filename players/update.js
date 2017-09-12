@@ -72,6 +72,6 @@ module.exports.update = (event, context, callback) => {
     }
 
     // create a response
-    callback(null, {statusCode: 200});
+    callback(null, {statusCode: 204});
   });
 };
