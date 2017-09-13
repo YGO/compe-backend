@@ -40,7 +40,12 @@ module.exports.update = (event, context, callback) => {
 
   if(!v.validate(data, schema).valid) {
     console.error('Validation Failed'); 
-    callback(null, {statusCode: 422});
+    callback(null, {
+      statusCode: 422,
+      headers: {
+        "Access-Control-Allow-Origin" : "*"
+      }
+    });
     return; 
   }
 
@@ -67,11 +72,21 @@ module.exports.update = (event, context, callback) => {
     // handle potential errors
     if (error) {
       console.error(error);
-      callback(null, {statusCode: 400});
+      callback(null, {
+        statusCode: 400,
+        headers: {
+          "Access-Control-Allow-Origin" : "*"
+        }
+      });
       return;
     }
 
     // create a response
-    callback(null, {statusCode: 204});
+    callback(null, {
+      statusCode: 204,
+      headers: {
+        "Access-Control-Allow-Origin" : "*"
+      }
+    });
   });
 };
