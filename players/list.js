@@ -13,13 +13,22 @@ module.exports.list = (event, context, callback) => {
     // handle potential errors
     if (error) {
       console.error(error);
-      callback(null, {statusCode: 400});
+      callback(null, {
+        statusCode: 400,
+        headers: {
+          "Access-Control-Allow-Origin" : "*"
+        }
+      });
+  
       return;
     }
 
     // create a response
     const response = {
       statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin" : "*"
+      },
       body: JSON.stringify(result.Items),
     };
     callback(null, response);
