@@ -54,7 +54,9 @@ module.exports.get = (event, context, callback) => {
           arr.push(getRoundEntry(roundsResult.Items[i].id));
         }
 
-        Promise.all(arr).then(() => {
+        Promise.all(arr).then((abc) => {
+          console.log('abc',abc)
+          result.scores = abc;
           resolve();
         });
       });
@@ -76,7 +78,8 @@ module.exports.get = (event, context, callback) => {
           return;
         } 
        
-        result.round_entries = roundEntriesResult.Items;
+        //result.round_entries = roundEntriesResult.Items;
+        console.log('roundEntriesResult.Items',roundEntriesResult.Items)
         let arr1 = [];
         let arr2 = [];
         for(var y=0;y<roundEntriesResult.Items.length;y++){
@@ -87,12 +90,12 @@ module.exports.get = (event, context, callback) => {
         Promise.all(arr1).then((all) => {
           result.players = all;
           finish++;
-          if (finish == 2) resolve();
+          if (finish == 2) resolve(roundEntriesResult.Items);
         });
         Promise.all(arr2).then((all) => {
           result.scores = all;
           finish++;
-          if (finish == 2) resolve();
+          if (finish == 2) resolve(roundEntriesResult.Items);
         });
       });
     });

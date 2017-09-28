@@ -29,9 +29,9 @@ provider:
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.ROUND_ENTRIES_TABLE}"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.ROUND_ENTRIES_TABLE}/index/round-entries-index"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.SCORES_TABLE}"
-        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.SCORES_TABLE}/index/entries-index"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.SCORES_TABLE}/index/scores-index"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.ENTRIES_TABLE}"
-        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.ENTRIES_TABLE}/index/scores-index"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.ENTRIES_TABLE}/index/entries-index"
 
 functions:
   CompetitionGet:
