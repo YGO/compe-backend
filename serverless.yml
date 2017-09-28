@@ -21,13 +21,17 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: 
+      Resource:
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.COMPETITIONS_TABLE}"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.PLAYERS_TABLE}"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.ROUNDS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.ROUNDS_TABLE}/index/rounds-index"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.ROUND_ENTRIES_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.ROUND_ENTRIES_TABLE}/index/round-entries-index"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.SCORES_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.SCORES_TABLE}/index/entries-index"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.ENTRIES_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.ENTRIES_TABLE}/index/scores-index"
 
 functions:
   CompetitionGet:
@@ -95,9 +99,21 @@ resources:
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
+          - AttributeName: competition_id
+            AttributeType: S
         KeySchema:
           - AttributeName: id
             KeyType: HASH
+        GlobalSecondaryIndexes:
+        - IndexName: rounds-index
+          KeySchema:
+          - AttributeName: competition_id
+            KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
@@ -110,13 +126,56 @@ resources:
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
+          - AttributeName: round_id
+            AttributeType: S
         KeySchema:
           - AttributeName: id
             KeyType: HASH
+        GlobalSecondaryIndexes:
+        - IndexName: round-entries-index
+          KeySchema:
+          - AttributeName: round_id
+            KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.ROUND_ENTRIES_TABLE}
+
+    EntriesDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: competition_id
+          AttributeType: S
+        - AttributeName: player_id
+          AttributeType: S
+        KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+        GlobalSecondaryIndexes:
+        - IndexName: entries-index
+          KeySchema:
+            - AttributeName: competition_id
+              KeyType: HASH
+            - AttributeName: player_id
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.ENTRIES_TABLE}
 
     ScoresDbTable:
       Type: 'AWS::DynamoDB::Table'
@@ -125,29 +184,22 @@ resources:
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
+          - AttributeName: round_entry_id
+            AttributeType: S
         KeySchema:
           - AttributeName: id
             KeyType: HASH
+        GlobalSecondaryIndexes:
+        - IndexName: scores-index
+          KeySchema:
+          - AttributeName: round_entry_id
+            KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.SCORES_TABLE}
-
-    EntriesDbTable:
-      Type: 'AWS::DynamoDB::Table'
-      DeletionPolicy: Retain
-      Properties:
-        AttributeDefinitions:
-        - AttributeName: competition_id
-          AttributeType: S
-        - AttributeName: player_id
-          AttributeType: S
-        KeySchema:
-        - AttributeName: competition_id
-          KeyType: HASH
-        - AttributeName: player_id
-          KeyType: RANGE
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.ENTRIES_TABLE}
