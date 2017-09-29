@@ -12,11 +12,10 @@ provider:
   name: aws
   runtime: nodejs4.3
   environment:
-    PLAYERS_CURRENT_TABLE: players-${opt:stage, self:provider.stage}
     COMPETITIONS_TABLE:  ${self:service}-competitions-${opt:stage, self:provider.stage}
     PLAYERS_TABLE:  ${self:service}-players-${opt:stage, self:provider.stage}
     ROUNDS_TABLE:  ${self:service}-rounds-${opt:stage, self:provider.stage}
-    ROUND_ENTRIES_TABLE:  ${self:service}-round-entries-${opt:stage, self:provider.stage}
+    ROUND_ENTRIES_TABLE:  ${self:service}-round_entries-${opt:stage, self:provider.stage}
     SCORES_TABLE:  ${self:service}-scores-${opt:stage, self:provider.stage}
     ENTRIES_TABLE:  ${self:service}-entries-${opt:stage, self:provider.stage}
     HOLES_TABLE:  ${self:service}-holes-${opt:stage, self:provider.stage}
@@ -31,7 +30,6 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource: 
-        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.PLAYERS_CURRENT_TABLE}"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.COMPETITIONS_TABLE}"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.PLAYERS_TABLE}"
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.ROUNDS_TABLE}"
@@ -64,39 +62,8 @@ functions:
           method: put
           cors: true
 
-  PlayerList:
-    handler: players/list.list
-    events:
-      - http:
-          path: players
-          method: get
-          cors: true
-
-  PlayerUpdate:
-    handler: players/update.update
-    events:
-      - http:
-          path: players/{id}
-          method: put
-          cors: true
-
 resources:
   Resources:
-    PlayerCurrentDbTable:
-      Type: 'AWS::DynamoDB::Table'
-      DeletionPolicy: Retain
-      Properties:
-        AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: id
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.PLAYERS_CURRENT_TABLE}
-
     CompetitionsDbTable:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: Retain

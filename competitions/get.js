@@ -55,7 +55,7 @@ module.exports.get = (event, context, callback) => {
   const findRoundEntries = (list) => {
       return dynamoDb.batchGet({
           RequestItems: {
-              'livescore-round-entries-staging': {
+              'livescore-round_entries-staging': {
                   Keys: list.map(e => ({
                           id: e.id
                       })
