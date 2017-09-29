@@ -54,9 +54,8 @@ module.exports.get = (event, context, callback) => {
           arr.push(getRoundEntry(roundsResult.Items[i].id));
         }
 
-        Promise.all(arr).then((abc) => {
-          console.log('abc',abc)
-          result.scores = abc;
+        Promise.all(arr).then((re) => {
+          result.round_entries = re;
           resolve();
         });
       });
@@ -78,8 +77,6 @@ module.exports.get = (event, context, callback) => {
           return;
         } 
        
-        //result.round_entries = roundEntriesResult.Items;
-        console.log('roundEntriesResult.Items',roundEntriesResult.Items)
         let arr1 = [];
         let arr2 = [];
         for(var y=0;y<roundEntriesResult.Items.length;y++){
