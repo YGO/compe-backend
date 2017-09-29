@@ -7,56 +7,55 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 module.exports.get = (event, context, callback) => {
   const findCompetition = (id) => {
     return dynamoDb.get({
-        TableName: process.env.COMPETITIONS_TABLE,
-        Key: {
-            id: id
-        }
+      TableName: process.env.COMPETITIONS_TABLE,
+      Key: {
+          id: id
+      }
     }).promise()
         .then(res => res.Item)
         .catch(error => console.error("Unable to findCompetition:", JSON.stringify(error, null, 2)));
   };
 
   const findRounds = (competitionId) => {
-      return dynamoDb.query({
-          TableName: process.env.ROUNDS_TABLE,
-          KeyConditionExpression: "competition_id = :competition_id",
-          ExpressionAttributeValues: {
-              ":competition_id": competitionId
-          }
-      }).promise()
-          .then(res => res.Items)
-          .catch(error => console.error("Unable to findRounds:", JSON.stringify(error, null, 2)));
+    return dynamoDb.query({
+      TableName: process.env.ROUNDS_TABLE,
+      KeyConditionExpression: "competition_id = :competition_id",
+      ExpressionAttributeValues: {
+          ":competition_id": competitionId
+      }
+    }).promise()
+        .then(res => res.Items)
+        .catch(error => console.error("Unable to findRounds:", JSON.stringify(error, null, 2)));
   };
 
   const findHoles = (competitionId) => {
-      return dynamoDb.query({
-          TableName: process.env.HOLES_TABLE,
-          KeyConditionExpression: "competition_id = :competition_id",
-          ExpressionAttributeValues: {
-              ":competition_id": competitionId
-          }
-      }).promise()
-          .then(res => res.Items)
-          .catch(error => console.error("Unable to findHoles:", JSON.stringify(error, null, 2)));
+    return dynamoDb.query({
+      TableName: process.env.HOLES_TABLE,
+      KeyConditionExpression: "competition_id = :competition_id",
+      ExpressionAttributeValues: {
+          ":competition_id": competitionId
+      }
+    }).promise()
+        .then(res => res.Items)
+        .catch(error => console.error("Unable to findHoles:", JSON.stringify(error, null, 2)));
   };
 
   const findEntries = (competitionId) => {
-      return dynamoDb.query({
-          TableName: process.env.ENTRIES_TABLE,
-          KeyConditionExpression: "competition_id = :competition_id",
-          ExpressionAttributeValues: {
-              ":competition_id": competitionId
-          }
-      }).promise()
-          .then(res => res.Items)
-          .catch(error => console.error("Unable to findEntries:", JSON.stringify(error, null, 2)));
+    return dynamoDb.query({
+      TableName: process.env.ENTRIES_TABLE,
+      KeyConditionExpression: "competition_id = :competition_id",
+      ExpressionAttributeValues: {
+          ":competition_id": competitionId
+      }
+    }).promise()
+        .then(res => res.Items)
+        .catch(error => console.error("Unable to findEntries:", JSON.stringify(error, null, 2)));
   };
 
   const findRoundEntries = (list) => {
     const keys = list.map(e => ({
-        id: e.id
-      })
-    );
+      id: e.id
+    }));
 
     const chunks = chunkKeys(keys, 100);
     const promises = chunks.map(c => {
@@ -75,11 +74,11 @@ module.exports.get = (event, context, callback) => {
       return chunks.reduce((a, b) => a.concat(b))
     });
   };
+
   const findScores = (list) => {
     const keys = list.map(e => ({
-        id: e.id
-      })
-    );
+      id: e.id
+    }));
 
     const chunks = chunkKeys(keys, 100);
     const promises = chunks.map(c => {
@@ -98,13 +97,13 @@ module.exports.get = (event, context, callback) => {
       return chunks.reduce((a, b) => a.concat(b))
     });
   };
+
   const findPlayers = (entries) => {
     const keys = entries.map(e => ({
-        id: e.player_id
-      })
-    );
+      id: e.player_id
+    }));
 
-    const chunks = chunkKeys(keys, 100);
+  const chunks = chunkKeys(keys, 100);
     const promises = chunks.map(c => {
       return dynamoDb.batchGet({
         RequestItems: {
@@ -122,6 +121,13 @@ module.exports.get = (event, context, callback) => {
     });
   };
 
+  const chunkKeys = (keys, size) => {
+    const chunks = [];
+    while (keys.length > 0)
+      chunks.push(keys.splice(0, size));
+    return chunks
+  };
+
   const convertPlayers = (players,entries) => {
     var list = [];
     players.forEach((p) => {
@@ -134,26 +140,20 @@ module.exports.get = (event, context, callback) => {
           });
         }
       }); 
-
     });
     return list;
   };
-  const chunkKeys = (keys, size) => {
-    const chunks = [];
-    while (keys.length > 0)
-      chunks.push(keys.splice(0, size));
-    return chunks
-  };
+
   const convertScores = (scores) => {
     var list = [];
     scores.forEach((s) => {
-          var arr = s.id.split(".")
-          list.push({
-            id: s.id,
-            scores: s.strokes,
-            player_id: arr[1],
-            round_id: arr[0]+'.'+arr[2]
-          });
+      var arr = s.id.split(".")
+      list.push({
+        id: s.id,
+        scores: s.strokes,
+        player_id: arr[1],
+        round_id: arr[0]+'.'+arr[2]
+      });
     });
     return list;
   };
@@ -161,33 +161,32 @@ module.exports.get = (event, context, callback) => {
   const convertRoundEntries = (rounds_entries) => {
     var list = [];
     rounds_entries.forEach((re) => {
-          var test = re.id.split(".")
-          console.log('test', test)
-          list.push({
-            round_id: test[0]+'.'+test[2],
-            player_id: test[1],
-            sort_order: test[2]
-          });
+      var arr = re.id.split(".")
+      list.push({
+        round_id: arr[0]+'.'+arr[2],
+        player_id: arr[1],
+        sort_order: arr[2]
+      });
     });
     return list;
   };
   const convertRounds = (rounds) => {
     var list = [];
     rounds.forEach((r) => {
-          list.push({
-            id: r.competition_id+'.'+r.play_order,
-            play_order: r.play_order,
-            title: r.title
-          });
+      list.push({
+        id: r.competition_id+'.'+r.play_order,
+        play_order: r.play_order,
+        title: r.title
+      });
     });
     return list;
   };
   const getAllCompetitionData = async (competitionId) => {
     const competition = await findCompetition(competitionId);
     const [holes, listRounds, entries] = await Promise.all([
-        findHoles(competition.id),
-        findRounds(competition.id),
-        findEntries(competition.id),
+      findHoles(competition.id),
+      findRounds(competition.id),
+      findEntries(competition.id),
     ]);
 
     var listId = [];
@@ -199,15 +198,16 @@ module.exports.get = (event, context, callback) => {
     });
 
     const [listPlayers,listRoundEntries, listScores] = await Promise.all([
-        findPlayers(entries),
-        findRoundEntries(listId),
-        findScores(listId),
+      findPlayers(entries),
+      findRoundEntries(listId),
+      findScores(listId),
     ]);
 
     var players = convertPlayers(listPlayers,entries);
     var scores = convertScores(listScores);
     var rounds = convertRounds(listRounds);
     var round_entries = convertRoundEntries(listRoundEntries);
+    
     var data = {holes,rounds,entries,round_entries,scores,players}
     data.id = competition.id;
     data.club_name = competition.club_name;
