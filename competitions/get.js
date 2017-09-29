@@ -23,6 +23,9 @@ module.exports.get = (event, context, callback) => {
           resolve();
         }
         result = competitionsResult.Item;
+        result.round_entries = [];
+        result.players = [];
+        result.scores = [];
         getRound(competitionsResult.Item.id).then(() => {
           resolve();
         });
@@ -76,7 +79,7 @@ module.exports.get = (event, context, callback) => {
           return;
         } 
        
-        result.round_entries = roundEntriesResult.Items;
+        result.round_entries.push(roundEntriesResult.Items);
         console.log('roundEntriesResult.Items',roundEntriesResult.Items)
         let arr1 = [];
         let arr2 = [];
@@ -86,12 +89,12 @@ module.exports.get = (event, context, callback) => {
         }
         let finish = 0;
         Promise.all(arr1).then((all) => {
-          result.players = all;
+          result.players.push(all);
           finish++;
           if (finish == 2) resolve();
         });
         Promise.all(arr2).then((all) => {
-          result.scores = all;
+          result.scores.push(all);
           finish++;
           if (finish == 2) resolve();
         });
@@ -142,13 +145,13 @@ module.exports.get = (event, context, callback) => {
         if(scoresResult.Items!=='undefined')
           resolve(scoresResult.Items);
         else
-          resole();
+          resolve();
       });
     });
   };
 
   let getPlayer = (playerId) => {
-  
+    console.log('playerId',playerId)
     return new Promise((resolve, reject) => {
       let paramPlayers = {
         TableName: process.env.PLAYERS_TABLE,
@@ -164,7 +167,7 @@ module.exports.get = (event, context, callback) => {
         if(playersResult.Items!=='undefined')
           resolve(playersResult.Items);
         else
-          resole();
+          resolve();
       });
     });
   };
