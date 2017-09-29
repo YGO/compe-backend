@@ -152,7 +152,7 @@ module.exports.get = (event, context, callback) => {
         id: s.id,
         scores: s.strokes,
         player_id: arr[1],
-        round_id: arr[0]+'.'+arr[2]
+        round_id: `${arr[0]}.${arr[2]}`
       });
     });
     return list;
@@ -163,7 +163,7 @@ module.exports.get = (event, context, callback) => {
     rounds_entries.forEach((re) => {
       var arr = re.id.split(".")
       list.push({
-        round_id: arr[0]+'.'+arr[2],
+        round_id: `${arr[0]}.${arr[2]}`,
         player_id: arr[1],
         sort_order: arr[2]
       });
@@ -174,7 +174,7 @@ module.exports.get = (event, context, callback) => {
     var list = [];
     rounds.forEach((r) => {
       list.push({
-        id: r.competition_id+'.'+r.play_order,
+        id: `${r.competition_id}.${r.play_order}`,
         play_order: r.play_order,
         title: r.title
       });
@@ -207,7 +207,7 @@ module.exports.get = (event, context, callback) => {
     var scores = convertScores(listScores);
     var rounds = convertRounds(listRounds);
     var round_entries = convertRoundEntries(listRoundEntries);
-    
+
     var data = {holes,rounds,entries,round_entries,scores,players}
     data.id = competition.id;
     data.club_name = competition.club_name;
