@@ -203,12 +203,18 @@ module.exports.get = (event, context, callback) => {
         findRoundEntries(listId),
         findScores(listId),
     ]);
-    //const players = await findPlayers(entries);
+
     var players = convertPlayers(listPlayers,entries);
     var scores = convertScores(listScores);
     var rounds = convertRounds(listRounds);
     var round_entries = convertRoundEntries(listRoundEntries);
-    var data = {holes,competition,rounds,entries,round_entries,scores,players}
+    var data = {holes,rounds,entries,round_entries,scores,players}
+    data.id = competition.id;
+    data.club_name = competition.club_name;
+    data.official_url = competition.official_url;
+    data.title = competition.title;
+    data.club_url = competition.club_url;
+    data.term = competition.term;
     const response = {
       statusCode: 200,
       headers: {
