@@ -12,7 +12,7 @@ provider:
   name: aws
   runtime: nodejs4.3
   environment:
-    PLAYERS_CURRENT_TABLE: players-staging
+    PLAYERS_CURRENT_TABLE: players-${opt:stage, self:provider.stage}
     COMPETITIONS_TABLE:  ${self:service}-competitions-${opt:stage, self:provider.stage}
     PLAYERS_TABLE:  ${self:service}-players-${opt:stage, self:provider.stage}
     ROUNDS_TABLE:  ${self:service}-rounds-${opt:stage, self:provider.stage}
@@ -82,6 +82,21 @@ functions:
 
 resources:
   Resources:
+    PlayerCurrentDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.PLAYERS_CURRENT_TABLE}
+
     CompetitionsDbTable:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: Retain
