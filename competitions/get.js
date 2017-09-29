@@ -53,48 +53,73 @@ module.exports.get = (event, context, callback) => {
   };
 
   const findRoundEntries = (list) => {
-      return dynamoDb.batchGet({
-          RequestItems: {
-              'livescore-round_entries-staging': {
-                  Keys: list.map(e => ({
-                          id: e.id
-                      })
-                  )
-              }
-          }
-      }).promise()
-          .then(res => res.Responses[process.env.ROUND_ENTRIES_TABLE])
-          .catch(error => console.error("Unable to findRoundEntries:", JSON.stringify(error, null, 2)));
-  };
+    const keys = list.map(e => ({
+        id: e.id
+      })
+    );
 
+    const chunks = chunkKeys(keys, 100);
+    const promises = chunks.map(c => {
+      return dynamoDb.batchGet({
+        RequestItems: {
+          'livescore-round_entries-staging': {
+            Keys: c
+          }
+        }
+      }).promise()
+        .then(res => res.Responses[process.env.ROUND_ENTRIES_TABLE])
+        .catch(error => console.error("Unable to findPlayers:", JSON.stringify(error, null, 2)));
+    });
+
+    return Promise.all(promises).then(chunks => {
+      return chunks.reduce((a, b) => a.concat(b))
+    });
+  };
   const findScores = (list) => {
-      return dynamoDb.batchGet({
-          RequestItems: {
-              'livescore-scores-staging': {
-                  Keys: list.map(e => ({
-                          id: e.id
-                      })
-                  )
-              }
-          }
-      }).promise()
-          .then(res => res.Responses[process.env.SCORES_TABLE])
-          .catch(error => console.error("Unable to findScores:", JSON.stringify(error, null, 2)));
-  };
+    const keys = list.map(e => ({
+        id: e.id
+      })
+    );
 
-  const findPlayers = (entries) => {
+    const chunks = chunkKeys(keys, 100);
+    const promises = chunks.map(c => {
       return dynamoDb.batchGet({
-          RequestItems: {
-              'livescore-players-staging': {
-                  Keys: entries.map(e => ({
-                          id: e.player_id
-                      })
-                  )
-              }
+        RequestItems: {
+          'livescore-scores-staging': {
+            Keys: c
           }
+        }
       }).promise()
-          .then(res => res.Responses[process.env.PLAYERS_TABLE])
-          .catch(error => console.error("Unable to findPlayers:", JSON.stringify(error, null, 2)));
+        .then(res => res.Responses[process.env.SCORES_TABLE])
+        .catch(error => console.error("Unable to findPlayers:", JSON.stringify(error, null, 2)));
+    });
+
+    return Promise.all(promises).then(chunks => {
+      return chunks.reduce((a, b) => a.concat(b))
+    });
+  };
+  const findPlayers = (entries) => {
+    const keys = entries.map(e => ({
+        id: e.player_id
+      })
+    );
+
+    const chunks = chunkKeys(keys, 100);
+    const promises = chunks.map(c => {
+      return dynamoDb.batchGet({
+        RequestItems: {
+          'livescore-players-staging': {
+            Keys: c
+          }
+        }
+      }).promise()
+        .then(res => res.Responses[process.env.PLAYERS_TABLE])
+        .catch(error => console.error("Unable to findPlayers:", JSON.stringify(error, null, 2)));
+    });
+
+    return Promise.all(promises).then(chunks => {
+      return chunks.reduce((a, b) => a.concat(b))
+    });
   };
 
   const convertPlayers = (players,entries) => {
@@ -113,7 +138,12 @@ module.exports.get = (event, context, callback) => {
     });
     return list;
   };
-
+  const chunkKeys = (keys, size) => {
+    const chunks = [];
+    while (keys.length > 0)
+      chunks.push(keys.splice(0, size));
+    return chunks
+  };
   const convertScores = (scores) => {
     var list = [];
     scores.forEach((s) => {
@@ -177,7 +207,7 @@ module.exports.get = (event, context, callback) => {
     var players = convertPlayers(listPlayers,entries);
     var scores = convertScores(listScores);
     var rounds = convertRounds(listRounds);
-    var round_entries = convertRounds(listRoundEntries);
+    var round_entries = convertRoundEntries(listRoundEntries);
     var data = {holes,competition,rounds,entries,round_entries,scores,players}
     const response = {
       statusCode: 200,
