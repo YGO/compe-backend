@@ -178,14 +178,7 @@ module.exports.get = (event, context, callback) => {
     var scores = convertScores(listScores);
     var rounds = convertRounds(listRounds);
     var round_entries = convertRounds(listRoundEntries);
-    var data = competition;
-    data.push(holes);
-    data.push(rounds);
-    data.push(entries);
-    data.push(players);
-    data.push(round_entries);
-    data.push(scores);
-    //var data = {holes,competition,rounds,entries,players,round_entries,scores,players}
+    var data = {holes,competition,rounds,entries,round_entries,scores,players}
     const response = {
       statusCode: 200,
       headers: {
