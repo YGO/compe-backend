@@ -165,7 +165,7 @@ module.exports.get = (event, context, callback) => {
       list.push({
         round_id: `${arr[0]}.${arr[2]}`,
         player_id: arr[1],
-        sort_order: arr[2]
+        sort_order: re.sort_order
       });
     });
     return list;
