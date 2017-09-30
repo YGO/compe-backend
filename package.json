@@ -20,5 +20,7 @@
     "serverless-webpack": "^3.1.0",
     "webpack": "^3.6.0",
     "webpack-node-externals": "^1.6.0"
-  }
+  },
+  "main": "index.js",
+  "repository": "ssh://git@github.com/YGO/compe-backend.git"
 }

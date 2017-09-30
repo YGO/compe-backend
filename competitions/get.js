@@ -9,11 +9,11 @@ module.exports.get = (event, context, callback) => {
     return dynamoDb.get({
       TableName: process.env.COMPETITIONS_TABLE,
       Key: {
-          id: id
+        id: id
       }
     }).promise()
-        .then(res => res.Item)
-        .catch(error => console.error("Unable to findCompetition:", JSON.stringify(error, null, 2)));
+      .then(res => res.Item)
+      .catch(error => console.error("Unable to findCompetition:", JSON.stringify(error, null, 2)));
   };
 
   const findRounds = (competitionId) => {
@@ -21,11 +21,11 @@ module.exports.get = (event, context, callback) => {
       TableName: process.env.ROUNDS_TABLE,
       KeyConditionExpression: "competition_id = :competition_id",
       ExpressionAttributeValues: {
-          ":competition_id": competitionId
+        ":competition_id": competitionId
       }
     }).promise()
-        .then(res => res.Items)
-        .catch(error => console.error("Unable to findRounds:", JSON.stringify(error, null, 2)));
+      .then(res => res.Items)
+      .catch(error => console.error("Unable to findRounds:", JSON.stringify(error, null, 2)));
   };
 
   const findHoles = (competitionId) => {
@@ -33,11 +33,11 @@ module.exports.get = (event, context, callback) => {
       TableName: process.env.HOLES_TABLE,
       KeyConditionExpression: "competition_id = :competition_id",
       ExpressionAttributeValues: {
-          ":competition_id": competitionId
+        ":competition_id": competitionId
       }
     }).promise()
-        .then(res => res.Items)
-        .catch(error => console.error("Unable to findHoles:", JSON.stringify(error, null, 2)));
+      .then(res => res.Items)
+      .catch(error => console.error("Unable to findHoles:", JSON.stringify(error, null, 2)));
   };
 
   const findEntries = (competitionId) => {
@@ -45,11 +45,11 @@ module.exports.get = (event, context, callback) => {
       TableName: process.env.ENTRIES_TABLE,
       KeyConditionExpression: "competition_id = :competition_id",
       ExpressionAttributeValues: {
-          ":competition_id": competitionId
+        ":competition_id": competitionId
       }
     }).promise()
-        .then(res => res.Items)
-        .catch(error => console.error("Unable to findEntries:", JSON.stringify(error, null, 2)));
+      .then(res => res.Items)
+      .catch(error => console.error("Unable to findEntries:", JSON.stringify(error, null, 2)));
   };
 
   const findRoundEntries = (list) => {
@@ -103,7 +103,7 @@ module.exports.get = (event, context, callback) => {
       id: e.player_id
     }));
 
-  const chunks = chunkKeys(keys, 100);
+    const chunks = chunkKeys(keys, 100);
     const promises = chunks.map(c => {
       return dynamoDb.batchGet({
         RequestItems: {
@@ -128,18 +128,18 @@ module.exports.get = (event, context, callback) => {
     return chunks
   };
 
-  const convertPlayers = (players,entries) => {
+  const convertPlayers = (players, entries) => {
     var list = [];
     players.forEach((p) => {
       entries.forEach((e) => {
-        if(e.player_id === p.id){
+        if (e.player_id === p.id) {
           list.push({
             id: p.id,
             name: p.name,
             retired: e.retired
           });
         }
-      }); 
+      });
     });
     return list;
   };
@@ -192,33 +192,30 @@ module.exports.get = (event, context, callback) => {
     var listId = [];
     entries.forEach((e) => {
       listRounds.forEach((r) => {
-        if(e.competition_id === r.competition_id)
+        if (e.competition_id === r.competition_id)
           listId.push({id: `${e.competition_id}.${e.player_id}.${r.play_order}`})
       });
     });
 
-    const [listPlayers,listRoundEntries, listScores] = await Promise.all([
+    const [listPlayers, listRoundEntries, listScores] = await Promise.all([
       findPlayers(entries),
       findRoundEntries(listId),
       findScores(listId),
     ]);
 
-    var players = convertPlayers(listPlayers,entries);
+    var players = convertPlayers(listPlayers, entries);
     var scores = convertScores(listScores);
     var rounds = convertRounds(listRounds);
     var round_entries = convertRoundEntries(listRoundEntries);
 
-    var data = {holes,rounds,entries,round_entries,scores,players}
-    data.id = competition.id;
-    data.club_name = competition.club_name;
-    data.official_url = competition.official_url;
-    data.title = competition.title;
-    data.club_url = competition.club_url;
-    data.term = competition.term;
+    var data = {
+      ...competition,
+      holes, rounds, entries, round_entries, scores, players
+    }
     const response = {
       statusCode: 200,
       headers: {
-        "Access-Control-Allow-Origin" : "*"
+        "Access-Control-Allow-Origin": "*"
       },
       body: JSON.stringify(data),
     };
