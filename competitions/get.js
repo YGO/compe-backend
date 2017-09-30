@@ -150,7 +150,7 @@ module.exports.get = (event, context, callback) => {
       var arr = s.id.split(".")
       list.push({
         id: s.id,
-        scores: s.strokes,
+        strokes: s.strokes,
         player_id: arr[1],
         round_id: `${arr[0]}.${arr[2]}`
       });
