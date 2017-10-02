@@ -4,7 +4,7 @@ export class EntryRepository {
   }
 
   update(competitionId, entryNumber, params) {
-    this.docClient.update({
+    return this.docClient.update({
       TableName: process.env.ENTRIES_TABLE,
       Key: {
         competition_id: competitionId,

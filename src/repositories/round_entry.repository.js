@@ -4,7 +4,7 @@ export class RoundEntryRepository {
   }
 
   update(competitionId, roundEntryNumber, params) {
-    this.docClient.update({
+    return this.docClient.update({
       TableName: process.env.ROUND_ENTRIES_TABLE,
       Key: {
         competition_id: competitionId,
