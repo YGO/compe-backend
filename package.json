@@ -5,10 +5,9 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "ajv": "^5.2.3",
     "aws-sdk": "^2.124.0",
-    "babel-runtime": "^6.26.0",
-    "jsonschema": "^1.2.0",
-    "uuid": "^2.0.3"
+    "babel-runtime": "^6.26.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
