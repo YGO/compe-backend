@@ -1,55 +1,148 @@
-service: players
+service: livescore
 
 frameworkVersion: ">=1.1.0 <2.0.0"
+
+plugins:
+  - serverless-webpack
+
+custom:
+  webpackIncludeModules: true
 
 provider:
   name: aws
   runtime: nodejs4.3
   environment:
-    DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
+    COMPETITIONS_TABLE:  ${self:service}-competitions-${opt:stage, self:provider.stage}
+    ENTRIES_TABLE:  ${self:service}-entries-${opt:stage, self:provider.stage}
+    ROUNDS_TABLE:  ${self:service}-rounds-${opt:stage, self:provider.stage}
+    ROUND_ENTRIES_TABLE:  ${self:service}-round_entries-${opt:stage, self:provider.stage}
+    HOLES_TABLE:  ${self:service}-holes-${opt:stage, self:provider.stage}
   iamRoleStatements:
     - Effect: Allow
       Action:
         - dynamodb:Query
-        - dynamodb:Scan
         - dynamodb:GetItem
-        - dynamodb:PutItem
         - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
-
+      Resource:
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.COMPETITIONS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.ENTRIES_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.ROUNDS_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.ROUND_ENTRIES_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.HOLES_TABLE}"
 functions:
-
-  list:
-    handler: players/list.list
+  CompetitionGet:
+    handler: src/resources/competitions/get.handler
     events:
       - http:
-          path: players
+          path: competitions/{id}
           method: get
           cors: true
-  update:
-    handler: players/update.update
+
+  EntryUpdate:
+    handler: src/resources/entries/update.handler
     events:
       - http:
-          path: players/{id}
+          path: entries/{id}
+          method: put
+          cors: true
+
+  RoundEntryUpdate:
+    handler: src/resources/round_entries/update.handler
+    events:
+      - http:
+          path: round_entries/{id}
           method: put
           cors: true
 
 resources:
   Resources:
-    TodosDynamoDbTable:
+    CompetitionsDbTable:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: Retain
       Properties:
         AttributeDefinitions:
-          -
-            AttributeName: id
+          - AttributeName: id
             AttributeType: S
         KeySchema:
-          -
-            AttributeName: id
+          - AttributeName: id
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.DYNAMODB_TABLE}
+        TableName: ${self:provider.environment.COMPETITIONS_TABLE}
+
+    EntriesDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: competition_id
+            AttributeType: S
+          - AttributeName: entry_number
+            AttributeType: S
+        KeySchema:
+          - AttributeName: competition_id
+            KeyType: HASH
+          - AttributeName: entry_number
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.ENTRIES_TABLE}
+
+    RoundsDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: competition_id
+            AttributeType: S
+          - AttributeName: play_order
+            AttributeType: N
+        KeySchema:
+          - AttributeName: competition_id
+            KeyType: HASH
+          - AttributeName: play_order
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.ROUNDS_TABLE}
+
+    RoundEntriesDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: competition_id
+            AttributeType: S
+          - AttributeName: round_entry_number
+            AttributeType: S
+        KeySchema:
+          - AttributeName: competition_id
+            KeyType: HASH
+          - AttributeName: round_entry_number
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.ROUND_ENTRIES_TABLE}
+
+    HolesDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+        - AttributeName: competition_id
+          AttributeType: S
+        - AttributeName: hole_num
+          AttributeType: N
+        KeySchema:
+        - AttributeName: competition_id
+          KeyType: HASH
+        - AttributeName: hole_num
+          KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.HOLES_TABLE}
