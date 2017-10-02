@@ -31,7 +31,7 @@ provider:
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.HOLES_TABLE}"
 functions:
   CompetitionGet:
-    handler: src/competitions/get.handler
+    handler: src/resources/competitions/get.handler
     events:
       - http:
           path: competitions/{id}
@@ -39,7 +39,7 @@ functions:
           cors: true
 
   EntryUpdate:
-    handler: src/entries/update.handler
+    handler: src/resources/entries/update.handler
     events:
       - http:
           path: entries/{id}
@@ -47,7 +47,7 @@ functions:
           cors: true
 
   RoundEntryUpdate:
-    handler: src/round_entries/update.handler
+    handler: src/resources/round_entries/update.handler
     events:
       - http:
           path: round_entries/{id}
