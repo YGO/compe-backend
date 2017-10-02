@@ -4,6 +4,8 @@ frameworkVersion: ">=1.1.0 <2.0.0"
 
 plugins:
   - serverless-webpack
+  - serverless-dynamodb-local
+  - serverless-offline
 
 custom:
   webpackIncludeModules: true
