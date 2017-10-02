@@ -1,12 +1,14 @@
 import {competitionRepository} from "../../repositories/index";
 
 const getCompetitionResources = (id) => {
+  const repo = competitionRepository();
+
   return Promise.all([
-    competitionRepository.find(id),
-    competitionRepository.findEntries(id),
-    competitionRepository.findRounds(id),
-    competitionRepository.findRoundEntries(id),
-    competitionRepository.findHoles(id),
+    repo.find(id),
+    repo.findEntries(id),
+    repo.findRounds(id),
+    repo.findRoundEntries(id),
+    repo.findHoles(id),
   ]).then(results => {
     const [competition, entries, rounds, roundEntries, holes] = results;
     return {

@@ -14,6 +14,6 @@ if (process.env.APP_STAGE === 'dev') {
   docClient = new AWS.DynamoDB.DocumentClient();
 }
 
-export const competitionRepository = new CompetitionRepository(docClient);
-export const entryRepository = new EntryRepository(docClient);
-export const roundEntryRepository = new RoundEntryRepository(docClient);
+export const competitionRepository = () => new CompetitionRepository(docClient);
+export const entryRepository = () => new EntryRepository(docClient);
+export const roundEntryRepository = () => new RoundEntryRepository(docClient);

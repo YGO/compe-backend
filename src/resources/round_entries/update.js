@@ -55,7 +55,8 @@ module.exports.handler = async (event, context, callback) => {
   }
 
   try {
-    await roundEntryRepository.update(roundEntry.competition_id, roundEntry.round_entry_number, {
+    const repo = roundEntryRepository();
+    await repo.update(roundEntry.competition_id, roundEntry.round_entry_number, {
       strokes: roundEntry.strokes,
     });
     callback(null, {

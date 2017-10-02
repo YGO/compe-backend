@@ -50,7 +50,8 @@ module.exports.handler = async (event, context, callback) => {
   }
 
   try {
-    await entryRepository.update(entry.competition_id, entry.entry_number, {
+    const repo = entryRepository();
+    await repo.update(entry.competition_id, entry.entry_number, {
       retired: entry.retired,
     });
     callback(null, {
