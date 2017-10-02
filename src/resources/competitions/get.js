@@ -1,17 +1,12 @@
-import {CompetitionRepository} from "../../repositories/competition.repository";
-import * as AWS from "aws-sdk";
-
-const docClient = new AWS.DynamoDB.DocumentClient();
+import {competitionRepository} from "../../repositories/index";
 
 const getCompetitionResources = (id) => {
-  const repo = new CompetitionRepository(docClient);
-
   return Promise.all([
-    repo.find(id),
-    repo.findEntries(id),
-    repo.findRounds(id),
-    repo.findRoundEntries(id),
-    repo.findHoles(id),
+    competitionRepository.find(id),
+    competitionRepository.findEntries(id),
+    competitionRepository.findRounds(id),
+    competitionRepository.findRoundEntries(id),
+    competitionRepository.findHoles(id),
   ]).then(results => {
     const [competition, entries, rounds, roundEntries, holes] = results;
     return {

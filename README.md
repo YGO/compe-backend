@@ -2,42 +2,38 @@
 
 ## Setup
 
+Install dependencies.
 ```bash
 yarn install
 ```
-
-## Deploy
-
-In order to deploy the endpoint simply run
-
-```bash
-serverless deploy
-```
-
-## Migrate dynamodb database in local
 
 Install DynamoDB Local 
 ```bash
 sls dynamodb install
 ```
 
+## Develop
+
+Start DynamoDB Local
 ```bash
-sls dynamodb start -p 8000  --migrate true
+sls dynamodb start
 ```
 
-## Run serverless and dynamodb in local
-
-Step1: Set region and endpoint for AWS like as:
-
-```
-const docClient = new AWS.DynamoDB.DocumentClient({
-    region: 'localhost',
-    endpoint: 'http://localhost:8000'
-});
-```
-
-Step2: Run command
+Start Serverless Offline
 ```bash
-sls offline
+sls offline --port 3001
+curl "http://localhost:3001/competitions/pgateaching_201709"
+```
+
+## Deploy
+
+Deploy to staging.
+```bash
+serverless deploy --stage staging
+```
+
+Deploy to production.
+```bash
+serverless deploy --stage production
 ```
 
