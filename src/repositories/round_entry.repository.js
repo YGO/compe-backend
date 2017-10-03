@@ -1,3 +1,13 @@
+import {
+  buildExpressionAttributeValues,
+  buildUpdateExpression
+} from "./query-helper";
+
+const validFields = [
+  'strokes',
+  'sort_order',
+];
+
 export class RoundEntryRepository {
   constructor(docClient) {
     this.docClient = docClient
@@ -10,11 +20,8 @@ export class RoundEntryRepository {
         competition_id: competitionId,
         round_entry_number: roundEntryNumber,
       },
-      // TODO support other fields
-      ExpressionAttributeValues: {
-        ':strokes': params.strokes,
-      },
-      UpdateExpression: 'SET strokes = :strokes',
+      ExpressionAttributeValues: buildExpressionAttributeValues(params, validFields),
+      UpdateExpression: buildUpdateExpression(params, validFields),
     }).promise()
   }
 }

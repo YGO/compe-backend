@@ -9,7 +9,7 @@ const baseResponse = {
 const Ajv = require('ajv');
 const ajv = new Ajv();
 const validateEntry = ajv.compile({
-  title: 'Entry',
+  title: 'Entry Update Parameter',
   type: 'object',
   properties: {
     competition_id: {
@@ -20,7 +20,10 @@ const validateEntry = ajv.compile({
     },
     retired: {
       type: 'boolean',
-    }
+    },
+    player_name: {
+      type: 'string',
+    },
   },
   required: ['competition_id', 'entry_number']
 });
@@ -51,9 +54,7 @@ module.exports.handler = async (event, context, callback) => {
 
   try {
     const repo = entryRepository();
-    await repo.update(entry.competition_id, entry.entry_number, {
-      retired: entry.retired,
-    });
+    await repo.update(entry.competition_id, entry.entry_number, entry);
     callback(null, {
       statusCode: 204,
       headers: {
