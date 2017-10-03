@@ -4,14 +4,37 @@ frameworkVersion: ">=1.1.0 <2.0.0"
 
 plugins:
   - serverless-webpack
+  - serverless-dynamodb-local
+  - serverless-offline
 
 custom:
   webpackIncludeModules: true
+
+  dynamodb:
+    start:
+      migrate: true
+      seed: true
+      inMemory: true
+
+    seed:
+      livescore:
+        sources:
+          - table: ${self:provider.environment.COMPETITIONS_TABLE}
+            sources: [./seeds/competitions.json]
+          - table: ${self:provider.environment.ENTRIES_TABLE}
+            sources: [./seeds/entries.json]
+          - table: ${self:provider.environment.ROUNDS_TABLE}
+            sources: [./seeds/rounds.json]
+          - table: ${self:provider.environment.ROUND_ENTRIES_TABLE}
+            sources: [./seeds/round_entries.json]
+          - table: ${self:provider.environment.HOLES_TABLE}
+            sources: [./seeds/holes.json]
 
 provider:
   name: aws
   runtime: nodejs4.3
   environment:
+    APP_STAGE: ${opt:stage, self:provider.stage}
     COMPETITIONS_TABLE:  ${self:service}-competitions-${opt:stage, self:provider.stage}
     ENTRIES_TABLE:  ${self:service}-entries-${opt:stage, self:provider.stage}
     ROUNDS_TABLE:  ${self:service}-rounds-${opt:stage, self:provider.stage}
@@ -146,3 +169,4 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.HOLES_TABLE}
+

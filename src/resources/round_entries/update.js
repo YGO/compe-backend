@@ -1,13 +1,10 @@
-import * as AWS from "aws-sdk";
-import {RoundEntryRepository} from '../../repositories/round_entry.repository'
+import {roundEntryRepository} from "../../repositories/index";
 
 const baseResponse = {
   headers: {
     "Access-Control-Allow-Origin": "*"
   }
 };
-
-const docClient = new AWS.DynamoDB.DocumentClient();
 
 const Ajv = require('ajv');
 const ajv = new Ajv();
@@ -58,7 +55,7 @@ module.exports.handler = async (event, context, callback) => {
   }
 
   try {
-    const repo = new RoundEntryRepository(docClient);
+    const repo = roundEntryRepository();
     await repo.update(roundEntry.competition_id, roundEntry.round_entry_number, {
       strokes: roundEntry.strokes,
     });

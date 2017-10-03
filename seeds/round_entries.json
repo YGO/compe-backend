@@ -1,0 +1,38 @@
+[
+  {
+    "competition_id": "pgateaching_201709",
+    "round_entry_number": "1.0",
+    "sort_order": 0,
+    "strokes": [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]
+  },
+  {
+    "competition_id": "pgateaching_201709",
+    "round_entry_number": "1.1",
+    "sort_order": 1,
+    "strokes": [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
+  },
+  {
+    "competition_id": "pgateaching_201709",
+    "round_entry_number": "2.0",
+    "sort_order": 1,
+    "strokes": [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+  },
+  {
+    "competition_id": "pgateaching_201709",
+    "round_entry_number": "2.1",
+    "sort_order": 0,
+    "strokes": [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+  },
+  {
+    "competition_id": "ks_compe_201710",
+    "round_entry_number": "1.0",
+    "sort_order": 0,
+    "strokes": [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+  },
+  {
+    "competition_id": "ks_compe_201710",
+    "round_entry_number": "1.1",
+    "sort_order": 1,
+    "strokes": [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+  }
+]
