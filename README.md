@@ -2,6 +2,11 @@
 
 ## Setup
 
+Install serverless and yarn.
+```bash
+npm install -g serverless yarn
+```
+
 Install dependencies.
 ```bash
 yarn install
