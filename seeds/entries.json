@@ -1,0 +1,26 @@
+[
+  {
+    "competition_id": "pgateaching_201709",
+    "entry_number": "0",
+    "player_name": "Trung BB",
+    "retired": false
+  },
+  {
+    "competition_id": "pgateaching_201709",
+    "entry_number": "1",
+    "player_name": "Cuong CL",
+    "retired": true
+  },
+  {
+    "competition_id": "ks_compe_201710",
+    "entry_number": "0",
+    "player_name": "Trung BB",
+    "retired": false
+  },
+  {
+    "competition_id": "ks_compe_201710",
+    "entry_number": "1",
+    "player_name": "Cuong CL",
+    "retired": true
+  }
+]

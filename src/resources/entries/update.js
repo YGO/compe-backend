@@ -1,18 +1,15 @@
-import * as AWS from "aws-sdk";
-import {EntryRepository} from "../../repositories/entry.repository";
+import {entryRepository} from "../../repositories/index";
 
 const baseResponse = {
   headers: {
-    "Access-Control-Allow-Origin" : "*"
+    "Access-Control-Allow-Origin": "*"
   }
 };
-
-const docClient = new AWS.DynamoDB.DocumentClient();
 
 const Ajv = require('ajv');
 const ajv = new Ajv();
 const validateEntry = ajv.compile({
-  title: 'Entry',
+  title: 'Entry Update Parameter',
   type: 'object',
   properties: {
     competition_id: {
@@ -23,7 +20,10 @@ const validateEntry = ajv.compile({
     },
     retired: {
       type: 'boolean',
-    }
+    },
+    player_name: {
+      type: 'string',
+    },
   },
   required: ['competition_id', 'entry_number']
 });
@@ -43,7 +43,7 @@ const mapEventToEntry = event => {
 module.exports.handler = async (event, context, callback) => {
   const entry = mapEventToEntry(event);
 
-  if(!validateEntry(entry)) {
+  if (!validateEntry(entry)) {
     callback(null, {
       ...baseResponse,
       statusCode: 422,
@@ -53,14 +53,12 @@ module.exports.handler = async (event, context, callback) => {
   }
 
   try {
-    const repo = new EntryRepository(docClient);
-    await repo.update(entry.competition_id, entry.entry_number, {
-      retired: entry.retired,
-    });
+    const repo = entryRepository();
+    await repo.update(entry.competition_id, entry.entry_number, entry);
     callback(null, {
       statusCode: 204,
       headers: {
-        "Access-Control-Allow-Origin" : "*"
+        "Access-Control-Allow-Origin": "*"
       }
     });
   } catch (e) {
@@ -68,7 +66,7 @@ module.exports.handler = async (event, context, callback) => {
     callback(null, {
       statusCode: 500,
       headers: {
-        "Access-Control-Allow-Origin" : "*"
+        "Access-Control-Allow-Origin": "*"
       }
     });
   }

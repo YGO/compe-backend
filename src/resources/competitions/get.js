@@ -1,10 +1,7 @@
-import {CompetitionRepository} from "../../repositories/competition.repository";
-import * as AWS from "aws-sdk";
-
-const docClient = new AWS.DynamoDB.DocumentClient();
+import {competitionRepository} from "../../repositories/index";
 
 const getCompetitionResources = (id) => {
-  const repo = new CompetitionRepository(docClient);
+  const repo = competitionRepository();
 
   return Promise.all([
     repo.find(id),

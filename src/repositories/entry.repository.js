@@ -1,3 +1,13 @@
+import {
+  buildExpressionAttributeValues,
+  buildUpdateExpression
+} from "./query-helper";
+
+const validFields = [
+  'retired',
+  'player_name',
+];
+
 export class EntryRepository {
   constructor(docClient) {
     this.docClient = docClient
@@ -10,11 +20,8 @@ export class EntryRepository {
         competition_id: competitionId,
         entry_number: entryNumber,
       },
-      // TODO support other fields
-      ExpressionAttributeValues: {
-        ':retired': params.retired,
-      },
-      UpdateExpression: 'SET retired = :retired',
+      ExpressionAttributeValues: buildExpressionAttributeValues(params, validFields),
+      UpdateExpression: buildUpdateExpression(params, validFields),
     }).promise()
   }
 }

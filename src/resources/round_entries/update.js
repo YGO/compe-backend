@@ -1,5 +1,4 @@
-import * as AWS from "aws-sdk";
-import {RoundEntryRepository} from '../../repositories/round_entry.repository'
+import {roundEntryRepository} from "../../repositories/index"
 
 const baseResponse = {
   headers: {
@@ -7,12 +6,10 @@ const baseResponse = {
   }
 };
 
-const docClient = new AWS.DynamoDB.DocumentClient();
-
 const Ajv = require('ajv');
 const ajv = new Ajv();
 const validateRoundEntry = ajv.compile({
-  title: 'RoundEntry',
+  title: 'RoundEntry Update Parameter',
   type: 'object',
   properties: {
     competition_id: {
@@ -29,6 +26,9 @@ const validateRoundEntry = ajv.compile({
         type: 'integer',
         minimum: 0,
       }
+    },
+    sort_order: {
+      type: 'number',
     }
   },
   required: ['competition_id', 'round_entry_number']
@@ -58,10 +58,8 @@ module.exports.handler = async (event, context, callback) => {
   }
 
   try {
-    const repo = new RoundEntryRepository(docClient);
-    await repo.update(roundEntry.competition_id, roundEntry.round_entry_number, {
-      strokes: roundEntry.strokes,
-    });
+    const repo = roundEntryRepository();
+    await repo.update(roundEntry.competition_id, roundEntry.round_entry_number, roundEntry);
     callback(null, {
       statusCode: 204,
       headers: {
