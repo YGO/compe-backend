@@ -32,7 +32,7 @@ custom:
 
 provider:
   name: aws
-  runtime: nodejs4.3
+  runtime: nodejs6.10
   environment:
     APP_STAGE: ${opt:stage, self:provider.stage}
     COMPETITIONS_TABLE:  ${self:service}-competitions-${opt:stage, self:provider.stage}
