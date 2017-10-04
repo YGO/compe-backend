@@ -7,33 +7,21 @@ Install dependencies.
 yarn install
 ```
 
-Install DynamoDB Local 
+Install DynamoDB Local.
 ```bash
 sls dynamodb install
 ```
 
 ## Develop
 
-Start DynamoDB Local
+Start DB and server locally.
 ```bash
-sls dynamodb start
-```
-
-Start Serverless Offline
-```bash
-sls offline --port 3001
-curl "http://localhost:3001/competitions/pgateaching_201709"
+yarn start
 ```
 
 ## Deploy
 
-Deploy to staging.
 ```bash
-serverless deploy --stage staging
-```
-
-Deploy to production.
-```bash
-serverless deploy --stage production
+sls deploy
 ```
 
